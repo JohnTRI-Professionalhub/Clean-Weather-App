@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atmos Weather</title>
+  <meta
+    name="description"
+    content="A clean weather dashboard with city search, current conditions, and a 5-day forecast."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Clean Forecasting</p>
+        <h1>Weather, redesigned for clarity.</h1>
+        <p class="hero-text">
+          Search any city to explore live conditions, daylight cycles, and a
+          streamlined multi-day forecast.
+        </p>
+      </div>
+      <div class="hero-badge">
+        <span>Open-Meteo</span>
+        <strong>No API key needed</strong>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="search-panel glass">
+        <div class="search-box">
+          <label class="sr-only" for="city-search">Search city</label>
+          <input
+            id="city-search"
+            type="text"
+            autocomplete="off"
+            placeholder="Search city, state, or country"
+          >
+          <button id="search-button" type="button" aria-label="Search weather">
+            Search
+          </button>
+        </div>
+        <div id="search-status" class="search-status">Loading default city...</div>
+        <div id="suggestions" class="suggestions" role="listbox" aria-label="City suggestions"></div>
+      </section>
+
+      <section class="overview-grid">
+        <article class="current-card glass">
+          <div class="card-heading">
+            <div>
+              <p class="section-label">Current Weather</p>
+              <h2 id="location-name">Loading city...</h2>
+              <p id="updated-at" class="updated-at">Fetching latest data</p>
+            </div>
+            <div class="condition-pill">
+              <div id="weather-icon" class="weather-icon">SUN</div>
+              <div>
+                <div id="current-temp" class="current-temp">-- deg</div>
+                <div id="current-summary" class="current-summary">Waiting for data</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metrics-grid">
+            <article class="metric">
+              <span>Feels like</span>
+              <strong id="feels-like">-- deg</strong>
+            </article>
+            <article class="metric">
+              <span>Humidity</span>
+              <strong id="humidity">--%</strong>
+            </article>
+            <article class="metric">
+              <span>Wind</span>
+              <strong id="wind-speed">-- km/h</strong>
+            </article>
+            <article class="metric">
+              <span>Pressure</span>
+              <strong id="pressure">-- hPa</strong>
+            </article>
+            <article class="metric">
+              <span>UV Index</span>
+              <strong id="uv-index">--</strong>
+            </article>
+            <article class="metric">
+              <span>Visibility</span>
+              <strong id="visibility">-- km</strong>
+            </article>
+          </div>
+
+          <div class="sun-grid">
+            <article class="sun-card">
+              <span>Sunrise</span>
+              <strong id="sunrise">--:--</strong>
+            </article>
+            <article class="sun-card">
+              <span>Sunset</span>
+              <strong id="sunset">--:--</strong>
+            </article>
+            <article class="sun-card">
+              <span>Moonrise</span>
+              <strong id="moonrise">--:--</strong>
+            </article>
+            <article class="sun-card">
+              <span>Moonset</span>
+              <strong id="moonset">--:--</strong>
+            </article>
+          </div>
+        </article>
+
+        <aside class="side-panel glass">
+          <p class="section-label">Conditions</p>
+          <div class="condition-stack">
+            <div class="mini-stat">
+              <span>Precipitation</span>
+              <strong id="precipitation">-- mm</strong>
+            </div>
+            <div class="mini-stat">
+              <span>Cloud Cover</span>
+              <strong id="cloud-cover">--%</strong>
+            </div>
+            <div class="mini-stat">
+              <span>Day / Night</span>
+              <strong id="day-phase">--</strong>
+            </div>
+          </div>
+          <div class="accent-card">
+            <p>Forecasts that feel easier to scan.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="forecast-panel glass">
+        <div class="panel-head">
+          <div>
+            <p class="section-label">5-Day Outlook</p>
+            <h3>Weather Forecast</h3>
+          </div>
+          <p class="forecast-note">High, low, and likely sky conditions for the days ahead.</p>
+        </div>
+        <div id="forecast-grid" class="forecast-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <template id="forecast-template">
+    <article class="forecast-card">
+      <p class="forecast-day"></p>
+      <p class="forecast-date"></p>
+      <div class="forecast-icon"></div>
+      <p class="forecast-summary"></p>
+      <div class="forecast-range">
+        <strong class="forecast-max"></strong>
+        <span class="forecast-min"></span>
+      </div>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
