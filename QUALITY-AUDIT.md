@@ -1,70 +1,81 @@
-# Weather comparisons
+# Weather data audit — November 11, 2026
 
-November 11, 2026. These are saved checks from development, not live weather reports.
+## Chicago follow-up
 
-The app originally used Open-Meteo for both current temperature and forecasts. After these checks, current temperature was changed to NWS station observations for US locations. Forecasts still come from Open-Meteo.
+The discrepancy is in the upstream weather estimates, not our temperature conversion or an accidentally selected city. The original 9.6°C value converts to 49.28°F correctly. Weather.com's live Chicago page continued to show 56°F, now with a 9:41 AM CST timestamp. Its air-quality detail link exposes a downtown location of 41.882, -87.632; this identifies the page's area, not necessarily its temperature observation station.
 
-## Chicago: why did the temperatures differ?
+To isolate location and time effects, queried the NWS KMDW observation archive and Open-Meteo's 15-minute series at KMDW's actual coordinates (-87.75528, 41.78417). At exactly 9:15 AM CST, NWS reported 11°C (51.8°F, quality flag V), versus the model's 9.7°C (49.46°F): a 2.34°F cold difference. At 9:35 AM NWS still reported 51.8°F; the model's bracketing 9:30 and 9:45 samples were 50.36°F and 50.54°F. These are nearby grid estimates, not thermometer observations at the identical physical sensor. The NWS 8:53 observation had a null temperature and was excluded.
 
-The app showed 49°F while Weather.com showed 56°F. The raw API value was 9.6°C, which correctly converts to 49.28°F. The requested coordinates were in Chicago, and the returned forecast grid was about 0.43 km away.
+Requesting Open-Meteo at the downtown coordinates from Weather.com's page did **not** eliminate the gap: model samples were 48.02°F at 9:30 and 48.38°F at 9:45, compared with Weather.com's 56°F at 9:41. Thus location alone does not explain it, and there is no evidence of an app-side unit or time-zone bug. Different providers' underlying models/observations and processing are the remaining source of disagreement. The available public page does not identify Weather.com's temperature station or processing sufficiently to attribute the full gap to a particular meteorological cause; we cannot establish which downtown estimate was closest to reality from these samples.
 
-A comparison at Midway Airport gave a smaller difference:
+Conclusion: the app reliably presents its provider's model, with a modest cold difference in this matched airport sample. The original 7°F cross-provider discrepancy is not proof that the app is 7°F wrong, but it is also not resolved enough to claim validated citywide accuracy. Do not alter or blend values just to match Weather.com. Before an accuracy claim, collect repeated time-aligned station comparisons across multiple locations and weather situations. No GitHub push was made.
 
-| Source | Time, CST | Temperature |
-| --- | --- | --- |
-| NWS station KMDW | 9:15 AM | 51.8°F |
-| Open-Meteo, requested at KMDW | 9:15 AM | 49.46°F |
-| NWS station KMDW | 9:35 AM | 51.8°F |
-| Open-Meteo, requested at KMDW | 9:30 AM | 50.36°F |
-| Open-Meteo, requested at KMDW | 9:45 AM | 50.54°F |
+Evidence (public data saved with retrieval timestamps and request URLs):
+- `audits/chicago-followup-2026-11-11.json`: NWS observation history and app API response.
+- `audits/chicago-station-match-2026-11-11.json`: exact NWS station metadata and model samples requested there.
+- `audits/chicago-downtown-match-2026-11-11.json`: downtown model samples.
+- [NWS station observations](https://api.weather.gov/stations/KMDW/observations)
+- [Weather.com Chicago](https://weather.com/en-ZA/us/illinois/city/chicago/today)
 
-The exact-time comparison was 2.34°F apart. The station measures a specific location; the model estimates weather for a nearby grid cell. A separate NWS report at 8:53 AM had no temperature value and was excluded.
+Fahrenheit is now the default for new/cleared preferences, with mph wind units. Explicit saved Celsius choices are still honored; this user's browser was switched to Fahrenheit and persistence checked after reload.
 
-Weather.com's page linked to a downtown point at 41.882, -87.632. Requesting that point from Open-Meteo still gave about 48°F around 9:30–9:45 AM, while Weather.com showed 56°F at 9:41 AM. Changing the location did not close the gap.
+## Verdict
 
-The app was displaying its API correctly. The remaining disagreement was between providers, but Weather.com's page did not identify its temperature station or processing well enough to explain the full difference. These checks don't establish which downtown value was closer to the actual temperature.
+The sampled app values accurately reflect Open-Meteo's response for Bauxite, Arkansas. That verifies location selection, units and rendering, not forecast skill. Nearby independent sources broadly agree on temperature but differ on humidity and cloud cover. This is a useful portfolio app with clearer data semantics after this audit; a single morning cannot establish professional forecasting accuracy.
 
-Sources: [NWS KMDW observations](https://api.weather.gov/stations/KMDW/observations), [Weather.com Chicago](https://weather.com/en-ZA/us/illinois/city/chicago/today).
+## Bauxite comparison
 
-## Bauxite
+Retrieved around 9:42–9:45 AM CST. Open-Meteo raw capture is in `audits/bauxite-2026-11-11.json` (9:44:47 AM retrieval, 9:30 AM valid time). Website values below were read from live browser pages, since search/indexed versions returned stale October observations.
 
-These values were read around 9:42–9:45 AM CST. The Open-Meteo sample was valid at 9:30 AM, Weather.com's page said 9:42 AM, and the NWS station report was from 9:35 AM.
+| Metric                   | Atmos / Open-Meteo      | Weather.com, Bauxite 72011 | NWS, Saline County Airport KSUZ |
+| ------------------------ | ----------------------- | -------------------------- | ------------------------------- |
+| Current valid/as-of time | 9:30 AM CST             | 9:42 AM CST                | 9:35 AM CST                     |
+| Temperature              | 20.2°C / 68.36°F → 68°F | 70°F                       | 70°F                            |
+| Current condition        | Clear                   | Partly cloudy              | Partly cloudy                   |
+| Humidity                 | 81%                     | 72%                        | 73%                             |
+| Wind                     | 11.9 km/h → 7 mph, 244° | 6 mph WSW                  | 6 mph SW                        |
+| Today's high             | 26.3°C → 79°F           | 80°F                       | 79°F point forecast             |
+| Sunrise / sunset         | 6:40 AM / 5:08 PM       | 6:39 AM / 5:08 PM          | Not compared                    |
 
-| Reading | Open-Meteo | Weather.com | NWS KSUZ |
-| --- | --- | --- | --- |
-| Temperature | 68.36°F | 70°F | 70°F |
-| Conditions | Clear | Partly cloudy | Partly cloudy |
-| Humidity | 81% | 72% | 73% |
-| Wind | 7 mph | 6 mph WSW | 6 mph SW |
-| Today's high | 79°F | 80°F | 79°F point forecast |
-| Sunrise / sunset | 6:40 AM / 5:08 PM | 6:39 AM / 5:08 PM | Not compared |
+Sources:
 
-The requested city center was 34.55565, -92.52127. Open-Meteo's grid was about 1.4 km away; KSUZ was about 5.4 km away. These are nearby locations, not identical sites. The websites may also share upstream data, so agreement between them isn't necessarily independent confirmation.
+- [Weather.com Bauxite current weather](https://weather.com/en-TO/us/arkansas/bauxite/postcode/72011/today)
+- [Weather.com Bauxite daily forecast](https://weather.com/en-TO/us/arkansas/bauxite/postcode/72011/tenday)
+- [NWS Bauxite point forecast and nearby airport observation](https://forecast.weather.gov/MapClick.php?lat=34.5751&lon=-92.5357)
+- [Open-Meteo field definitions](https://open-meteo.com/en/docs)
 
-Sources: [Weather.com Bauxite](https://weather.com/en-TO/us/arkansas/bauxite/postcode/72011/today), [NWS Bauxite](https://forecast.weather.gov/MapClick.php?lat=34.5751&lon=-92.5357).
+Requested city center: 34.55565, -92.52127. Provider grid: 34.558876, -92.53607, approximately 1.40 km away. NWS observation is at KSUZ (34.59, -92.48), approximately 5.4 km from the city center. NWS point forecast is at 34.5751, -92.5357, approximately 2.5 km away. These are nearby samples, not identical measurement sites or simultaneous readings. Weather.com's page identifies the Bauxite postal area; its reporting station was not established. Its data may share upstream sources with NWS, so the sites are not necessarily independent observations.
 
-## Labels that needed fixing
+The model is about 1.6°F cooler, 8–9 percentage points more humid, and clearer than the displayed station/site conditions. These are real source differences; there is no basis to patch the app's numbers to match another website. Daily highs agree within 1°F. Tomorrow's highs diverge more: app 66°F, NWS 68°F, Weather.com 70°F. Longer-range accuracy remains unproven.
 
-- The daily icon said overcast even though the daytime hours were clear. Open-Meteo uses the day's most severe condition, including overnight hours. The app now explains that.
-- The app's 57°F daily low and another site's 47°F overnight low covered different periods. The app now explains that its daily range follows the calendar day.
-- Daily precipitation shows the highest hourly probability. Peak daily UV is also different from a current UV reading.
+## Important interpretation issues
 
-These definitions come from the [Open-Meteo documentation](https://open-meteo.com/en/docs).
+- Open-Meteo current conditions are 15-minute model estimates, not a live thermometer observation. The UI now states this explicitly.
+- Bauxite's daily code was overcast although the current and daytime hours were clear. Open-Meteo defines the daily code as the most severe condition anywhere in the full day; the overnight hourly data contained overcast conditions. Added an explanation rather than changing provider data.
+- The app's 57°F minimum for Nov 11 is a calendar-day minimum. Weather.com and NWS show 47°F for the overnight period extending into Nov 12. These do not cover the same interval. The app's Nov 12 6 AM sample is approximately 48°F. The UI now explains the calendar-day boundary.
+- Daily precipitation is the maximum hourly probability, not an independently calculated chance over an entire day. The UI now states this. Peak daily UV is also not comparable to Weather.com's current UV value.
+- A supplementary Chicago API capture verifies a grid within 0.43 km of the requested city center. Its 49°F model estimate differed from Weather.com's live displayed 56°F at 9:32 AM. The earlier NWS page showed 47°F at 7:53 AM and is not a simultaneous comparator. This larger discrepancy is unresolved at the meteorological level and prevents any blanket accuracy claim.
 
-## After switching to station readings
+## Changes and verification
 
-Chicago displayed 52°F from KMDW, 7.1 miles from the city center. Bauxite displayed 70°F from KSUZ, 3.4 miles away. Both reports were from 9:35 AM CST and matched the station API values after rounding.
+- Explicitly request Celsius and km/h and validate returned units before conversion.
+- Reject distant/malformed grid coordinates, timestamps older than an hour or too far in the future, missing current-day coverage, misordered times, invalid percentages/negative wind, and reversed high/low ranges. The 50 km grid guard detects gross location errors; it is not a precision guarantee.
+- Preserve legitimate null measurements as unavailable, and reject missing required current fields.
+- Remove the silent fallback that used day zero when today's bucket was missing.
+- Show date and time zone with the provider timestamp; mark displayed data out of date after an hour. Check for refresh every minute while visible once 15 minutes have passed, and on return/reconnection. Network errors retain the previously labeled forecast.
+- Correct daylight rounding to avoid a duration ending in 60 minutes; include hourly wind in accessible labels.
+- Regression tests use a saved public API response and cover corrupted units, location, timestamps, ranges, missing data and calendar coverage, in addition to the existing DST, conversion and request-race tests.
 
-The app checks up to three listed stations within 50 km. A temperature must have quality flag V and be no older than 90 minutes. If no reading qualifies, the current temperature is unavailable and the forecast remains visible. The station and forecast each have their own timestamp.
+## Remaining limits
 
-This makes the source of the current temperature clearer. It does not mean a nearby airport has the same temperature as every neighborhood. Longer-term checks are still needed to assess availability and forecast accuracy.
+No alert feed or radar is integrated; the official forecast/alert link remains available. Real weather accuracy needs repeated, time-aligned model-versus-station comparisons over different weather events and locations, reporting errors separately by forecast horizon. The app remains a single-provider forecast display. Changes are local to `codex/weather-staging`; no deployment or remote push was performed.
 
-## Saved responses
+## Implemented: observed temperature and hourly graph
 
-Each JSON file includes the request URL and retrieval time.
+The current-temperature display now uses nearby US station reports via NWS; it no longer substitutes Open-Meteo current temperature. All forecast fields remain Open-Meteo and are labeled separately. A missing, stale, invalid, unsupported or failed observation produces an unavailable current temperature while leaving the forecast usable. The nearest qualifying station among the three closest listed stations within 50 km is used. Reports must be within 90 minutes and have a valid numeric Celsius temperature with quality flag V. This improves provenance, not a guarantee of conditions at the user's exact address.
 
-- `audits/bauxite-2026-11-11.json`: original Bauxite forecast.
-- `audits/chicago-2026-11-11.json`: original Chicago forecast.
-- `audits/chicago-followup-2026-11-11.json`: NWS reports and the follow-up forecast.
-- `audits/chicago-station-match-2026-11-11.json`: KMDW station details and model values at that location.
-- `audits/chicago-downtown-match-2026-11-11.json`: model values at the downtown point.
+Live checks on November 11: Chicago displayed 52°F from KMDW, observed 9:35 AM CST, 7.1 miles from the city center. Bauxite displayed 70°F from KSUZ at the same observation time, 3.4 miles away. Both matched the station API readings obtained during development. Independent timestamps identify the model forecast and station observation. Browser requests successfully reached NWS directly.
+
+The hourly section now includes a temperature line above aligned condition/temperature/precipitation/wind cards. Rounded hourly changes, earlier/later controls, and 12/24-hour switching are included. Missing or non-consecutive samples break the plotted line. Fahrenheit remains selected and is the default. Browser checks verified 24 chart points for 24 hours, Celsius/Fahrenheit updates, scrolling at a 390px mobile viewport without document overflow, and no application console errors in the checked flow.
+
+Validation: 27 automated tests pass, covering observation quality, stale/future readings, missing values, wrong units, distance sorting/filtering, fallback to another station, unsupported countries, service failure, cancellation, graph gaps and conversion, plus the earlier forecast tests. Browser coverage remains the available Chromium-based preview; other browser engines and long-running field accuracy evaluation are not claimed. All changes remain local to staging; nothing has been pushed.
