@@ -1,74 +1,61 @@
 # Atmos
 
-A weather app designed around the next decision in your day: what it feels like now, what's coming next, and when there might be a pleasant hour outside.
+A weather app built with HTML, CSS, and JavaScript. It shows nearby station temperatures, an hourly temperature graph, and a seven-day forecast. No ads or API keys.
 
-## Run locally
+## Run it
 
-Requires Node.js 22 or newer. No dependencies to install and no API key.
+Install Node.js 22 or newer, then run:
 
 ```sh
 node server.js
 ```
 
-Open http://127.0.0.1:8001. The development server only exposes the six browser assets, and binds to localhost. It is not a production server.
+Open [localhost:8001](http://127.0.0.1:8001). There are no packages to install.
 
-## Features
+## What it does
 
-- Nearby station temperature (US coverage), a switchable 12/24-hour outlook with an aligned temperature graph, hourly changes, and a seven-day forecast.
-- Search worldwide cities with debouncing, arrow-key selection, Enter, and Escape.
-- Celsius/km/h and Fahrenheit/mph, converted from a single metric response.
-- Four recent cities and preferred units saved locally, with a clear-preferences control.
-- An outdoor window based on explicit daylight, temperature, wind, precipitation, and condition criteria. It is a forecast filter, not a safety assessment or weather alert system.
-- Timeouts, retry controls, stale-request cancellation, and clear labeling when an older forecast remains visible after an error.
-- Responsive layouts, named controls, live status messages, visible focus, reduced-motion support, and SVG weather symbols.
+- Search for cities and save the last four you visited.
+- View 12 or 24 forecast hours, with temperature changes, rain chances, and wind.
+- Switch between Fahrenheit/mph and Celsius/km/h. Fahrenheit is the default.
+- Switch between dark and light mode.
+- Check sunrise, sunset, UV, and the week's highs and lows.
+- Find a mild, mostly dry hour outside using the criteria shown in the app.
 
-## Data correctness
+## Where the weather comes from
 
-Forecasts and city search use [Open-Meteo](https://open-meteo.com/). Forecasts are model output rather than a promise of observed conditions. See the [API documentation](https://open-meteo.com/en/docs).
+**Current temperature:** [NWS station observations](https://www.weather.gov/documentation/services-web-api), available for US locations. The app shows the station name, distance, and report time. It checks up to three stations within 50 km and uses the nearest one with a valid temperature from the past 90 minutes. If no reading qualifies, the temperature is shown as unavailable.
 
-The app requests Unix timestamps. Current and hourly timestamps, sunrise, and sunset are formatted in the selected city's IANA timezone. Daily aggregation labels use the response's fixed `utc_offset_seconds` to preserve the provider's calendar-day boundaries across DST changes. Missing values display as unavailable, never as zero.
+**Forecast:** [Open-Meteo](https://open-meteo.com/en/docs). This supplies hourly and daily forecasts, condition icons, feels-like temperature, wind, and humidity. These can differ from station readings, so they are labeled separately.
 
-The outdoor window is the first adjacent pair of daylight samples in the next 24 forecast hours with temperatures of 8–30°C, wind no greater than 25 km/h, precipitation chances no greater than 25%, and clear/cloudy weather codes. Its displayed interval spans those samples. If nothing qualifies or data is missing, the app says so. Thresholds are editorial choices, not personalized recommendations.
+Times follow the selected city's time zone. Daily lows cover a calendar day, which may differ from another site's overnight low. The hourly graph leaves gaps where temperatures are missing.
 
-## Development and checks
+City and unit preferences stay in your browser. Weather requests send city coordinates to the providers; searches go to Open-Meteo. The app does not request your device location.
+
+## Tests
 
 ```sh
-node --test
-node --check script.js
-node --check weather.js
-node --check server.js
+npm test
+npm run check
 ```
 
-The equivalent `npm test`, `npm run check`, and `npm run dev` scripts are available when npm is installed. Tests use Node's built-in test runner. GitHub Actions runs checks in Chicago, Tokyo, and Auckland timezone environments once the branch is pushed.
+You can also run the tests directly with `node --test`. The 27 tests cover conversions, dates, missing data, station selection, request failures, and graph values. GitHub Actions is configured to run the checks in three time zones.
 
-| File                    | Responsibility                                           |
-| ----------------------- | -------------------------------------------------------- |
-| `index.html`            | Semantic layout and accessible controls                  |
-| `styles.css`            | Responsive presentation                                  |
-| `script.js`             | DOM rendering, search interactions, state and storage    |
-| `weather.js`            | Data formatting, request coordination, forecast rules    |
-| `tests/weather.test.js` | Timezones, units, missing data, requests, forecast rules |
-| `server.js`             | Local development server                                 |
+## Files
 
-## Staging workflow
+| File | Contents |
+| --- | --- |
+| `index.html` | Page layout and controls |
+| `styles.css` | Layout, colors, and mobile styles |
+| `script.js` | Search, page updates, and saved preferences |
+| `weather.js` | API requests, station selection, conversions, and chart calculations |
+| `tests/` | Automated tests |
+| `server.js` | Local preview server |
+| `audits/` | Saved API responses used during the weather comparisons |
 
-Development happens on `codex/weather-staging`. Review the local app and run checks before pushing this branch. Open a pull request into `main` after review. Main remains the release baseline.
+## Project status
 
-Deployment is intentionally deferred. The eventual public site needs only `index.html`, `styles.css`, `script.js`, `weather.js`, and `favicon.svg` on a static host. No build step is required. The portfolio's separate public folder is not used by this app.
+The latest work is on `codex/weather-staging`. It has not been merged into `main` or deployed.
 
-## Boundaries and next validation
+See [REVIEW.md](REVIEW.md) for changes and unfinished work, and [QUALITY-AUDIT.md](QUALITY-AUDIT.md) for the Chicago and Bauxite comparisons.
 
-- Requires internet access for weather; no cached offline forecast.
-- Refresh is available manually, on returning to the tab, and while visible after 15 minutes; observation and forecast timestamps are separate.
-- Uses local system fonts and Georgia; no font downloads, ads, or analytics.
-- No geolocation permission, analytics, accounts, or API secrets. Search queries and coordinates go to Open-Meteo; US city coordinates also go to api.weather.gov; no external font requests are made. Recent cities and units remain in this browser's local storage.
-- Automated tests cover the data layer. Browser interaction and layout checks are currently manual; full screen-reader testing, Safari/Firefox coverage, and user feedback remain release work.
-- Check the provider's current usage terms and limits before public deployment.
-
-## Station temperature and hourly chart
-
-US current temperature uses the [NWS observation API](https://www.weather.gov/documentation/services-web-api). Nearby station metadata is cached in memory for 24 hours. The app checks the three closest listed stations within 50 km, chooses the nearest with a usable reading, and chooses its newest valid temperature from up to 12 recent reports. Only Celsius measurements with quality flag V, sensible bounds, and timestamps no older than 90 minutes (or more than five minutes in the future) qualify. A nearby station does not measure conditions at every address. NWS observations can be delayed by upstream quality control.
-
-The station name, identifier, distance and observation time are visible. No qualifying report, service failure, unsupported country or expired reading means unavailable current temperature, never a silently substituted model value. Forecasts load independently; condition icons, feels-like, wind and humidity remain explicitly labeled model forecasts. Late responses cannot overwrite another city's weather. Browser requests use the browser's normal User-Agent; no secrets or backend are required.
-
-The SVG hourly graph and cards use identical 96px time columns. Points show rounded displayed temperatures; changes are differences between adjacent displayed hourly values. Missing samples and non-consecutive times break the line. The scale follows the selected period, with its range stated above. Controls support 12/24 hours, horizontal navigation, and Fahrenheit/Celsius; no chart library or external assets are loaded.
+Station coverage is US-only. There is no offline forecast, radar, or built-in alert feed. Browser checks have been manual so far; automated browser tests, screen-reader testing, and Firefox/Safari checks are still needed.
