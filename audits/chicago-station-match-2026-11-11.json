@@ -1,0 +1,111 @@
+{
+  "retrievedAt": "2026-11-11T15:48:40.979Z",
+  "station": {
+    "@context": [
+      "https://geojson.org/geojson-ld/geojson-context.jsonld",
+      {
+        "@version": "1.1",
+        "wx": "https://api.weather.gov/ontology#",
+        "s": "https://schema.org/",
+        "geo": "http://www.opengis.net/ont/geosparql#",
+        "unit": "http://codes.wmo.int/common/unit/",
+        "@vocab": "https://api.weather.gov/ontology#",
+        "geometry": {
+          "@id": "s:GeoCoordinates",
+          "@type": "geo:wktLiteral"
+        },
+        "city": "s:addressLocality",
+        "state": "s:addressRegion",
+        "distance": {
+          "@id": "s:Distance",
+          "@type": "s:QuantitativeValue"
+        },
+        "bearing": {
+          "@type": "s:QuantitativeValue"
+        },
+        "value": {
+          "@id": "s:value"
+        },
+        "unitCode": {
+          "@id": "s:unitCode",
+          "@type": "@id"
+        },
+        "forecastOffice": {
+          "@type": "@id"
+        },
+        "forecastGridData": {
+          "@type": "@id"
+        },
+        "publicZone": {
+          "@type": "@id"
+        },
+        "county": {
+          "@type": "@id"
+        }
+      }
+    ],
+    "id": "https://api.weather.gov/stations/KMDW",
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -87.75528,
+        41.78417
+      ]
+    },
+    "properties": {
+      "@id": "https://api.weather.gov/stations/KMDW",
+      "@type": "wx:ObservationStation",
+      "elevation": {
+        "unitCode": "wmoUnit:m",
+        "value": 188.0616
+      },
+      "stationIdentifier": "KMDW",
+      "name": "Chicago, Chicago Midway Airport",
+      "timeZone": "America/Chicago",
+      "provider": "ASOS-HFM",
+      "subProvider": "",
+      "forecast": "https://api.weather.gov/zones/forecast/ILZ104",
+      "county": "https://api.weather.gov/zones/county/ILC031",
+      "fireWeatherZone": "https://api.weather.gov/zones/fire/ILZ014"
+    }
+  },
+  "url": "https://api.open-meteo.com/v1/forecast?latitude=41.78417&longitude=-87.75528&timezone=America%2FChicago&timeformat=unixtime&minutely_15=temperature_2m&past_minutely_15=8&forecast_minutely_15=1",
+  "data": {
+    "latitude": 41.780968,
+    "longitude": -87.77292,
+    "generationtime_ms": 0.03647804260253906,
+    "utc_offset_seconds": -21600,
+    "timezone": "America/Chicago",
+    "timezone_abbreviation": "GMT-6",
+    "elevation": 185,
+    "minutely_15_units": {
+      "time": "unixtime",
+      "temperature_2m": "°C"
+    },
+    "minutely_15": {
+      "time": [
+        1794404700,
+        1794405600,
+        1794406500,
+        1794407400,
+        1794408300,
+        1794409200,
+        1794410100,
+        1794411000,
+        1794411900
+      ],
+      "temperature_2m": [
+        7.8,
+        8.2,
+        8.4,
+        9,
+        9.2,
+        9.6,
+        9.7,
+        10.2,
+        10.3
+      ]
+    }
+  }
+}
