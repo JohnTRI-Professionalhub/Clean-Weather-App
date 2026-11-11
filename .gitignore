@@ -4,3 +4,10 @@ Desktop.ini
 .vscode/
 .idea/
 *.log
+
+local-reports/
+node_modules/
+_site/
+.env
+.env.*
+!.env.example

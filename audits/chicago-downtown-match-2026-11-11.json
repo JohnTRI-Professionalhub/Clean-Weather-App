@@ -1,0 +1,41 @@
+{
+  "retrievedAt": "2026-11-11T15:48:58.157Z",
+  "url": "https://api.open-meteo.com/v1/forecast?latitude=41.882&longitude=-87.632&timezone=America%2FChicago&timeformat=unixtime&minutely_15=temperature_2m&past_minutely_15=8&forecast_minutely_15=1",
+  "data": {
+    "latitude": 41.879498,
+    "longitude": -87.64974,
+    "generationtime_ms": 0.04756450653076172,
+    "utc_offset_seconds": -21600,
+    "timezone": "America/Chicago",
+    "timezone_abbreviation": "GMT-6",
+    "elevation": 286,
+    "minutely_15_units": {
+      "time": "unixtime",
+      "temperature_2m": "°C"
+    },
+    "minutely_15": {
+      "time": [
+        1794404700,
+        1794405600,
+        1794406500,
+        1794407400,
+        1794408300,
+        1794409200,
+        1794410100,
+        1794411000,
+        1794411900
+      ],
+      "temperature_2m": [
+        6.1,
+        6.3,
+        6.2,
+        7.1,
+        7.4,
+        7.9,
+        8.3,
+        8.9,
+        9.1
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "atmos-weather",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node --test",
+    "check": "node --check script.js && node --check weather.js && node --check server.js",
+    "test:browser": "node tests/browser/server.mjs",
+    "check:stations": "node scripts/check-stations.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

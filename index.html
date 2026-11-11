@@ -1,168 +1,341 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atmos Weather</title>
-  <meta
-    name="description"
-    content="A clean weather dashboard with city search, current conditions, and a 5-day forecast."
-  >
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="app-shell">
-    <header class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">Clean Forecasting</p>
-        <h1>Weather, redesigned for clarity.</h1>
-        <p class="hero-text">
-          Search any city to explore live conditions, daylight cycles, and a
-          streamlined multi-day forecast.
-        </p>
-      </div>
-      <div class="hero-badge">
-        <span>Open-Meteo</span>
-        <strong>No API key needed</strong>
-      </div>
-    </header>
-
-    <main class="dashboard">
-      <section class="search-panel glass">
-        <div class="search-box">
-          <label class="sr-only" for="city-search">Search city</label>
-          <input
-            id="city-search"
-            type="text"
-            autocomplete="off"
-            placeholder="Search city, state, or country"
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101c22" />
+    <meta
+      name="description"
+      content="Atmos: local weather, an hourly outlook, and a clearer window to get outside."
+    />
+    <title>Atmos — Weather for your day</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="script.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#weather">Skip to weather</a>
+    <div class="shell">
+      <header class="topbar">
+        <button id="theme-toggle" class="subtle-button" aria-pressed="true">
+          Dark mode
+        </button>
+        <a class="brand" href="./" aria-label="Atmos home"
+          ><svg viewBox="0 0 32 32" aria-hidden="true">
+            <path
+              d="M5 20h22M9 25h14M8 15a8 8 0 0 1 16 0M16 2v2M4 7l2 2M28 7l-2 2"
+            /></svg
+          >atmos<span class="brand-dot">.</span></a
+        ><span class="brand-note">A little perspective on your day.</span>
+        <div
+          class="unit-switch"
+          role="group"
+          aria-label="Temperature and wind units"
+        >
+          <button
+            id="unit-c"
+            aria-pressed="false"
+            aria-label="Celsius and kilometers per hour"
           >
-          <button id="search-button" type="button" aria-label="Search weather">
-            Search
+            °C</button
+          ><button
+            id="unit-f"
+            aria-pressed="true"
+            aria-label="Fahrenheit and miles per hour"
+          >
+            °F
           </button>
         </div>
-        <div id="search-status" class="search-status">Loading default city...</div>
-        <div id="suggestions" class="suggestions" role="listbox" aria-label="City suggestions"></div>
-      </section>
-
-      <section class="overview-grid">
-        <article class="current-card glass">
-          <div class="card-heading">
-            <div>
-              <p class="section-label">Current Weather</p>
-              <h2 id="location-name">Loading city...</h2>
-              <p id="updated-at" class="updated-at">Fetching latest data</p>
-            </div>
-            <div class="condition-pill">
-              <div id="weather-icon" class="weather-icon">SUN</div>
-              <div>
-                <div id="current-temp" class="current-temp">-- deg</div>
-                <div id="current-summary" class="current-summary">Waiting for data</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metrics-grid">
-            <article class="metric">
-              <span>Feels like</span>
-              <strong id="feels-like">-- deg</strong>
-            </article>
-            <article class="metric">
-              <span>Humidity</span>
-              <strong id="humidity">--%</strong>
-            </article>
-            <article class="metric">
-              <span>Wind</span>
-              <strong id="wind-speed">-- km/h</strong>
-            </article>
-            <article class="metric">
-              <span>Pressure</span>
-              <strong id="pressure">-- hPa</strong>
-            </article>
-            <article class="metric">
-              <span>UV Index</span>
-              <strong id="uv-index">--</strong>
-            </article>
-            <article class="metric">
-              <span>Visibility</span>
-              <strong id="visibility">-- km</strong>
-            </article>
-          </div>
-
-          <div class="sun-grid">
-            <article class="sun-card">
-              <span>Sunrise</span>
-              <strong id="sunrise">--:--</strong>
-            </article>
-            <article class="sun-card">
-              <span>Sunset</span>
-              <strong id="sunset">--:--</strong>
-            </article>
-            <article class="sun-card">
-              <span>Moonrise</span>
-              <strong id="moonrise">--:--</strong>
-            </article>
-            <article class="sun-card">
-              <span>Moonset</span>
-              <strong id="moonset">--:--</strong>
-            </article>
-          </div>
-        </article>
-
-        <aside class="side-panel glass">
-          <p class="section-label">Conditions</p>
-          <div class="condition-stack">
-            <div class="mini-stat">
-              <span>Precipitation</span>
-              <strong id="precipitation">-- mm</strong>
-            </div>
-            <div class="mini-stat">
-              <span>Cloud Cover</span>
-              <strong id="cloud-cover">--%</strong>
-            </div>
-            <div class="mini-stat">
-              <span>Day / Night</span>
-              <strong id="day-phase">--</strong>
-            </div>
-          </div>
-          <div class="accent-card">
-            <p>Forecasts that feel easier to scan.</p>
-          </div>
-        </aside>
-      </section>
-
-      <section class="forecast-panel glass">
-        <div class="panel-head">
-          <div>
-            <p class="section-label">5-Day Outlook</p>
-            <h3>Weather Forecast</h3>
-          </div>
-          <p class="forecast-note">High, low, and likely sky conditions for the days ahead.</p>
+      </header>
+      <div class="search-area">
+        <form id="search-form" class="search-form" role="search">
+          <label for="city-search" class="sr-only">Search for a city</label
+          ><svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10" cy="10" r="6" />
+            <path d="m15 15 5 5" /></svg
+          ><input
+            id="city-search"
+            type="search"
+            placeholder="Find your city…"
+            autocomplete="off"
+            spellcheck="false"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="suggestions"
+            aria-describedby="search-status"
+          /><button type="submit">
+            Search <span aria-hidden="true">↗</span>
+          </button>
+          <ul
+            id="suggestions"
+            role="listbox"
+            aria-label="Matching cities"
+            hidden
+          ></ul>
+        </form>
+        <p
+          id="search-status"
+          class="search-status"
+          role="status"
+          aria-live="polite"
+        >
+          Search by city name, anywhere in the world.
+        </p>
+        <div class="recent-row">
+          <span>RECENT</span>
+          <div id="recent-cities"></div>
         </div>
-        <div id="forecast-grid" class="forecast-grid"></div>
-      </section>
-    </main>
-  </div>
-
-  <template id="forecast-template">
-    <article class="forecast-card">
-      <p class="forecast-day"></p>
-      <p class="forecast-date"></p>
-      <div class="forecast-icon"></div>
-      <p class="forecast-summary"></p>
-      <div class="forecast-range">
-        <strong class="forecast-max"></strong>
-        <span class="forecast-min"></span>
       </div>
-    </article>
-  </template>
-
-  <script src="script.js"></script>
-</body>
+      <main id="weather" tabindex="-1">
+        <div class="location-row">
+          <div>
+            <p class="eyebrow" id="location-detail">YOUR DAILY OUTLOOK</p>
+            <h1 id="location-name">Chicago</h1>
+            <p id="local-date" class="muted">Getting your local forecast…</p>
+          </div>
+          <button id="refresh" class="subtle-button">
+            <span aria-hidden="true">↻</span> Refresh
+          </button>
+        </div>
+        <div class="notice" id="notice" role="status" aria-live="polite">
+          <span id="notice-text">Loading Chicago’s forecast…</span
+          ><button id="retry" hidden>Try again</button>
+        </div>
+        <div id="weather-content" hidden>
+          <div class="hero-grid">
+            <section class="current-panel" aria-labelledby="current-title">
+              <div class="current-top">
+                <h2 id="current-title" class="eyebrow">OBSERVED TEMPERATURE</h2>
+                <span id="updated-at"></span>
+              </div>
+              <div class="current-reading">
+                <div>
+                  <p class="temperature">
+                    <span id="current-temp">—</span
+                    ><span id="current-unit">F</span>
+                  </p>
+                  <p id="observation-age" class="observation-age"></p>
+                </div>
+              </div>
+              <p id="station-source" class="station-source" role="status"></p>
+              <a
+                id="station-link"
+                class="station-link"
+                target="_blank"
+                rel="noreferrer"
+                hidden
+                >View station reports ↗</a
+              >
+              <p class="observation-note">
+                Measured nearby. Conditions can vary across the city.
+              </p>
+              <div class="landscape" aria-hidden="true">
+                <svg viewBox="0 0 800 200" preserveAspectRatio="none">
+                  <path
+                    d="M0 170Q150 30 360 110T800 55V200H0Z"
+                    fill="#69908d"
+                    opacity=".28"
+                  />
+                  <path
+                    d="M0 190Q200 85 390 155T800 80V200H0Z"
+                    fill="#8fb0a2"
+                    opacity=".25"
+                  />
+                  <path
+                    d="M0 200Q190 145 400 185T800 135V200Z"
+                    fill="#c4cfad"
+                    opacity=".2"
+                  />
+                </svg>
+              </div>
+            </section>
+            <section class="forecast-panel" aria-labelledby="outlook-title">
+              <p class="eyebrow">MODEL FORECAST</p>
+              <h2 id="outlook-title">Today's outlook</h2>
+              <div id="current-icon" class="forecast-icon"></div>
+              <p id="current-summary" class="current-summary"></p>
+              <p id="feels-range" class="feels-range"></p>
+              <div class="forecast-metrics">
+                <span id="current-wind"></span
+                ><span id="current-humidity"></span>
+              </div>
+              <p id="forecast-asof" class="forecast-time"></p>
+            </section>
+            <section class="outdoor-panel" aria-labelledby="outdoor-heading">
+              <p class="eyebrow">
+                <span class="small-sun" aria-hidden="true">↗</span> MAKE ROOM
+                FOR OUTSIDE
+              </p>
+              <h2 id="outdoor-heading">Your next<br />breath of fresh air.</h2>
+              <p id="window-time" class="window-time"></p>
+              <p id="window-description" class="window-description"></p>
+              <details>
+                <summary>How we pick a window</summary>
+                <p id="window-method"></p>
+                <p>
+                  Based on the next 24 forecast hours. Conditions can change;
+                  this is not a weather alert service.
+                </p>
+              </details>
+            </section>
+          </div>
+          <section class="hourly-section" aria-labelledby="hourly-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">PLAN THE LITTLE THINGS</p>
+                <h2 id="hourly-title">The next 12 hours</h2>
+                <button
+                  id="hours-toggle"
+                  class="subtle-button"
+                  aria-pressed="false"
+                >
+                  Show 24 hours
+                </button>
+              </div>
+              <span class="muted small"
+                >Local time · <span id="hourly-unit"></span
+              ></span>
+            </div>
+            <p id="chart-summary" class="hourly-key"></p>
+            <div class="hourly-nav">
+              <button
+                id="hours-back"
+                class="subtle-button"
+                aria-label="Earlier forecast hours"
+              >
+                ← Earlier</button
+              ><button
+                id="hours-forward"
+                class="subtle-button"
+                aria-label="Later forecast hours"
+              >
+                Later →
+              </button>
+            </div>
+            <div
+              class="hourly-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="Hourly forecast, scroll horizontally for more hours"
+            >
+              <div id="temperature-chart" class="temperature-chart"></div>
+              <div id="hourly-grid" class="hourly-grid"></div>
+            </div>
+            <details class="hourly-table-details">
+              <summary>View hourly data table</summary>
+              <div
+                class="table-scroll"
+                tabindex="0"
+                role="region"
+                aria-label="Hourly forecast data table"
+              >
+                <table>
+                  <caption id="hourly-table-caption">
+                    Hourly forecast
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Local time</th>
+                      <th scope="col">Conditions</th>
+                      <th scope="col">Temperature</th>
+                      <th scope="col">Change</th>
+                      <th scope="col">Precipitation</th>
+                      <th scope="col">Wind</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hourly-table"></tbody>
+                </table>
+              </div>
+            </details>
+            <p class="hourly-key">
+              Droplets show the chance of precipitation.
+              <span class="mobile-hint">Swipe to explore →</span>
+            </p>
+          </section>
+          <div class="lower-grid">
+            <section class="week-section" aria-labelledby="week-title">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">A LOOK AHEAD</p>
+                  <h2 id="week-title">Your week, at a glance</h2>
+                </div>
+              </div>
+              <div class="forecast-labels" aria-hidden="true">
+                <span>DAY / CONDITIONS</span><span>PRECIP.</span
+                ><span>LOW — HIGH</span>
+              </div>
+              <ol id="daily-list" class="daily-list"></ol>
+              <p class="forecast-note">
+                Full calendar days: lows may occur before dawn. Icons show the
+                day’s most severe condition; percentages show its highest hourly
+                precipitation chance.
+              </p>
+            </section>
+            <section class="details-section" aria-labelledby="details-title">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">THE FINER DETAILS</p>
+                  <h2 id="details-title">Today’s essentials</h2>
+                </div>
+              </div>
+              <div class="essentials">
+                <article class="daylight-card">
+                  <h3>Daylight</h3>
+                  <div class="sun-arc" aria-hidden="true"><span>☀</span></div>
+                  <div class="sun-times">
+                    <div>
+                      <span>Sunrise</span><strong id="sunrise"></strong>
+                    </div>
+                    <div><span>Sunset</span><strong id="sunset"></strong></div>
+                  </div>
+                  <p id="daylight-note" class="muted small"></p>
+                </article>
+                <div class="detail-pair">
+                  <article>
+                    <h3>UV peak today</h3>
+                    <strong id="uv-value"></strong>
+                    <p class="muted small">Daily maximum index</p>
+                  </article>
+                  <article>
+                    <h3>Forecast humidity</h3>
+                    <strong id="humidity-value"></strong>
+                    <p class="muted small">Relative humidity</p>
+                  </article>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+        <noscript
+          ><p class="notice">
+            Enable JavaScript to load live forecasts. Atmos retrieves weather
+            directly from Open-Meteo.
+          </p></noscript
+        >
+      </main>
+      <footer>
+        <a href="https://www.weather.gov/" target="_blank" rel="noreferrer"
+          >Official US forecasts &amp; alerts ↗</a
+        ><span class="footer-brand">atmos.</span>
+        <p>
+          Weather data by
+          <a href="https://open-meteo.com/" target="_blank" rel="noreferrer"
+            >Open-Meteo ↗</a
+          ><br /><span
+            >Current temperature: nearby NWS station observation where
+            available. All other weather: Open-Meteo model forecast. All times
+            are local to the selected city.</span
+          >
+        </p>
+        <p class="storage-note">
+          Your recent cities and units stay in this browser.<br /><button
+            id="clear-history"
+          >
+            Clear saved preferences
+          </button>
+        </p>
+      </footer>
+    </div>
+  </body>
 </html>

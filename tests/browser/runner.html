@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Atmos browser checks</title>
+    <style>
+      body {
+        background: #101c22;
+        color: #e5ede8;
+        font: 16px system-ui;
+        margin: 24px;
+      }
+      button {
+        padding: 12px 20px;
+        cursor: pointer;
+      }
+      iframe {
+        width: 100%;
+        height: 650px;
+        border: 1px solid #62746e;
+        margin-top: 24px;
+        background: white;
+      }
+      li {
+        padding: 7px;
+      }
+      .pass {
+        color: #96ddae;
+      }
+      .fail {
+        color: #ffae9a;
+      }
+      a {
+        color: #b9ded7;
+      }
+    </style>
+    <script type="module" src="/runner.js"></script>
+  </head>
+  <body>
+    <h1>Atmos browser checks</h1>
+    <p>
+      Runs the real app with fixed API responses in an isolated frame. No live
+      weather requests or production preferences are used.
+    </p>
+    <button id="run">Run browser checks</button>
+    <p id="result" role="status">Ready</p>
+    <ol id="results"></ol>
+    <iframe id="app" title="Weather app under test"></iframe>
+  </body>
+</html>
