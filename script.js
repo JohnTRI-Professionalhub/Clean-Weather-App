@@ -24,7 +24,7 @@ import {
 
 const $ = (id) => document.getElementById(id);
 const text = (id, value) => {
-  $(id).textContent = value;
+  if ($(id).textContent !== String(value)) $(id).textContent = value;
 };
 const escape = (value) =>
   String(value).replace(
@@ -136,7 +136,22 @@ function renderFreshness() {
         timeZoneName: "short",
       }),
   );
-  text("current-title", usable ? "STATION OBSERVATION" : "STATION TEMPERATURE");
+  text("current-title", "OBSERVED TEMPERATURE");
+  text(
+    "observation-age",
+    usable
+      ? Math.max(0, Math.floor((Date.now() / 1000 - observation.time) / 60)) +
+          " minutes ago"
+      : observation
+        ? "Reading has expired"
+        : "Observation unavailable",
+  );
+  $("station-link").hidden = !observation;
+  if (observation)
+    $("station-link").href =
+      "https://forecast.weather.gov/data/obhistory/" +
+      encodeURIComponent(observation.station) +
+      ".html";
   text("current-temp", usable ? tempText(observation.temperature, unit) : "—");
   text(
     "updated-at",
@@ -253,23 +268,17 @@ function renderWeather() {
   renderFreshness();
 
   text("current-unit", unit.toUpperCase());
-  text(
-    "current-summary",
-    "Forecast: " + descriptor(c.weather_code, c.is_day).label,
-  );
+  text("current-summary", descriptor(c.weather_code, c.is_day).label);
   $("current-icon").innerHTML = icon(c.weather_code, c.is_day);
   document
-    .querySelector(".current-panel")
+    .querySelector(".forecast-panel")
     .classList.toggle("night", c.is_day === 0);
   text(
     "feels-range",
-    `Model feels like ${tempText(c.apparent_temperature, unit)} · High ${tempText(d.temperature_2m_max[todayIndex], unit)} · Low ${tempText(d.temperature_2m_min[todayIndex], unit)}`,
+    `Feels like ${tempText(c.apparent_temperature, unit)} · High ${tempText(d.temperature_2m_max[todayIndex], unit)} · Low ${tempText(d.temperature_2m_min[todayIndex], unit)}`,
   );
-  text("current-wind", `Forecast wind ${windText(c.wind_speed_10m, unit)}`);
-  text(
-    "current-humidity",
-    `Forecast humidity ${percent(c.relative_humidity_2m)}`,
-  );
+  text("current-wind", `Wind ${windText(c.wind_speed_10m, unit)}`);
+  text("current-humidity", `Humidity ${percent(c.relative_humidity_2m)}`);
   text("hourly-unit", `°${unit.toUpperCase()}`);
   const hours = nextHours(data, hourCount);
   const plot = temperaturePlot(hours, unit);
@@ -285,6 +294,41 @@ function renderWeather() {
         `<article class="hour-card" aria-label="${escape(localTime(h.time, tz, { weekday: "short", hour: "numeric", minute: "2-digit", timeZoneName: "short" }))}, ${escape(descriptor(h.code, h.isDay).label)}, ${tempText(h.temp, unit)} ${unit === "c" ? "Celsius" : "Fahrenheit"}, precipitation ${percent(h.rain)}, wind ${windText(h.wind, unit)}, change from previous hour ${plot.points[i]?.delta == null ? "unavailable" : plot.points[i].delta + " degrees"}"><span>${escape(localTime(h.time, tz, { hour: "numeric" }))}</span>${icon(h.code, h.isDay)}<strong class="hour-temp">${tempText(h.temp, unit)}</strong><span class="rain-chance">${droplet}${percent(h.rain)}</span><span class="hour-wind">${windText(h.wind, unit)}</span><span class="hour-delta">${plot.points[i]?.delta == null ? "—" : plot.points[i].delta === 0 ? "Steady" : (plot.points[i].delta > 0 ? "↑ +" : "↓ ") + plot.points[i].delta + "°"}</span></article>`,
     )
     .join("");
+  $("hourly-table").innerHTML = hours
+    .map(
+      (h, i) =>
+        '<tr><th scope="row">' +
+        escape(
+          localTime(h.time, tz, {
+            weekday: "short",
+            hour: "numeric",
+            minute: "2-digit",
+            timeZoneName: "short",
+          }),
+        ) +
+        "</th><td>" +
+        escape(descriptor(h.code, h.isDay).label) +
+        "</td><td>" +
+        tempText(h.temp, unit) +
+        unit.toUpperCase() +
+        "</td><td>" +
+        (plot.points[i]?.delta == null
+          ? "—"
+          : (plot.points[i].delta > 0 ? "+" : "") +
+            plot.points[i].delta +
+            "°") +
+        "</td><td>" +
+        percent(h.rain) +
+        "</td><td>" +
+        windText(h.wind, unit) +
+        "</td></tr>",
+    )
+    .join("");
+  text(
+    "hourly-table-caption",
+    currentPlace.name + " · " + hourCount + " forecast hours · " + tz,
+  );
+  requestAnimationFrame(syncHourNavigation);
   const lows = d.temperature_2m_min.filter(finite),
     highs = d.temperature_2m_max.filter(finite);
   const min = Math.min(...lows),
@@ -663,4 +707,32 @@ for (const [id, direction] of [
         ? "instant"
         : "smooth",
     });
+  });
+
+function syncHourNavigation() {
+  const el = document.querySelector(".hourly-scroll");
+  $("hours-back").disabled = el.scrollLeft <= 1;
+  $("hours-forward").disabled =
+    el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+}
+document
+  .querySelector(".hourly-scroll")
+  .addEventListener("scroll", syncHourNavigation, { passive: true });
+window.addEventListener("resize", syncHourNavigation);
+document
+  .querySelector(".hourly-scroll")
+  .addEventListener("keydown", (event) => {
+    if (
+      event.target !== event.currentTarget ||
+      !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
+    )
+      return;
+    event.preventDefault();
+    const el = event.currentTarget;
+    el.scrollLeft =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? el.scrollWidth
+          : el.scrollLeft + (event.key === "ArrowLeft" ? -96 : 96);
   });

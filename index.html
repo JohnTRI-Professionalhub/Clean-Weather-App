@@ -106,22 +106,30 @@
           <div class="hero-grid">
             <section class="current-panel" aria-labelledby="current-title">
               <div class="current-top">
-                <h2 id="current-title" class="eyebrow">MODEL ESTIMATE</h2>
+                <h2 id="current-title" class="eyebrow">OBSERVED TEMPERATURE</h2>
                 <span id="updated-at"></span>
               </div>
               <div class="current-reading">
                 <div>
                   <p class="temperature">
                     <span id="current-temp">—</span
-                    ><span id="current-unit">C</span>
+                    ><span id="current-unit">F</span>
                   </p>
-                  <p id="current-summary" class="current-summary"></p>
+                  <p id="observation-age" class="observation-age"></p>
                 </div>
-                <div id="current-icon" class="hero-icon"></div>
               </div>
               <p id="station-source" class="station-source" role="status"></p>
-              <p id="forecast-asof" class="station-source"></p>
-              <p id="feels-range" class="feels-range"></p>
+              <a
+                id="station-link"
+                class="station-link"
+                target="_blank"
+                rel="noreferrer"
+                hidden
+                >View station reports ↗</a
+              >
+              <p class="observation-note">
+                Measured nearby. Conditions can vary across the city.
+              </p>
               <div class="landscape" aria-hidden="true">
                 <svg viewBox="0 0 800 200" preserveAspectRatio="none">
                   <path
@@ -141,10 +149,18 @@
                   />
                 </svg>
               </div>
-              <div class="current-bottom">
+            </section>
+            <section class="forecast-panel" aria-labelledby="outlook-title">
+              <p class="eyebrow">MODEL FORECAST</p>
+              <h2 id="outlook-title">Today's outlook</h2>
+              <div id="current-icon" class="forecast-icon"></div>
+              <p id="current-summary" class="current-summary"></p>
+              <p id="feels-range" class="feels-range"></p>
+              <div class="forecast-metrics">
                 <span id="current-wind"></span
                 ><span id="current-humidity"></span>
               </div>
+              <p id="forecast-asof" class="forecast-time"></p>
             </section>
             <section class="outdoor-panel" aria-labelledby="outdoor-heading">
               <p class="eyebrow">
@@ -206,6 +222,32 @@
               <div id="temperature-chart" class="temperature-chart"></div>
               <div id="hourly-grid" class="hourly-grid"></div>
             </div>
+            <details class="hourly-table-details">
+              <summary>View hourly data table</summary>
+              <div
+                class="table-scroll"
+                tabindex="0"
+                role="region"
+                aria-label="Hourly forecast data table"
+              >
+                <table>
+                  <caption id="hourly-table-caption">
+                    Hourly forecast
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Local time</th>
+                      <th scope="col">Conditions</th>
+                      <th scope="col">Temperature</th>
+                      <th scope="col">Change</th>
+                      <th scope="col">Precipitation</th>
+                      <th scope="col">Wind</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hourly-table"></tbody>
+                </table>
+              </div>
+            </details>
             <p class="hourly-key">
               Droplets show the chance of precipitation.
               <span class="mobile-hint">Swipe to explore →</span>
