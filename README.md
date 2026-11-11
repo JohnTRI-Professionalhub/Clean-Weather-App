@@ -72,7 +72,9 @@ Each run records station availability, reading age, distance, and request durati
 
 Development happens on `codex/weather-staging`. Review the local app and run checks before pushing this branch. Open a pull request into `main` after review. Main remains the release baseline.
 
-Deployment is intentionally deferred. The eventual public site needs only `index.html`, `styles.css`, `script.js`, `weather.js`, and `favicon.svg` on a static host. No build step is required. The portfolio's separate public folder is not used by this app.
+The online staging preview uses GitHub Pages: [Open Atmos](https://johntri-professionalhub.github.io/Clean-Weather-App/). The `Deploy staging preview` workflow deploys pushes to `codex/weather-staging` after syntax checks and unit tests pass in all three timezone environments. Browser regression checks remain a separate local step.
+
+Only `index.html`, `styles.css`, `script.js`, `weather.js`, and `favicon.svg` are published. Tests, audit files, and the development server are excluded from the hosted artifact. No build step or paid hosting plan is required for this public repository. The portfolio's separate public folder is not used by this app. This URL is a public staging preview; deploying it does not merge changes into `main`.
 
 ## Boundaries and next validation
 

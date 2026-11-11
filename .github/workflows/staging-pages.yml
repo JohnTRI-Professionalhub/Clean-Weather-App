@@ -1,0 +1,54 @@
+name: Deploy staging preview
+
+on:
+  push:
+    branches: [codex/weather-staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-pages
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.ref == 'refs/heads/codex/weather-staging'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        timezone: [America/Chicago, Asia/Tokyo, Pacific/Auckland]
+    env:
+      TZ: ${{ matrix.timezone }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm run check
+      - run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Package browser assets
+        run: |
+          mkdir -p _site
+          cp index.html styles.css script.js weather.js favicon.svg _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy staging
+        id: deployment
+        uses: actions/deploy-pages@v5
