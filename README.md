@@ -2,6 +2,10 @@
 
 A weather app designed around the next decision in your day: what it feels like now, what's coming next, and when there might be a pleasant hour outside.
 
+**[Try Atmos](https://johntri-professionalhub.github.io/Clean-Weather-App/)** · [Data validation notes](docs/data-validation.md)
+
+Built with HTML, CSS, and JavaScript. Responsive, ad-free, and available in light and dark themes. No framework, account, or API key is required.
+
 ## Run locally
 
 Requires Node.js 22 or newer. No dependencies to install and no API key.
@@ -10,7 +14,7 @@ Requires Node.js 22 or newer. No dependencies to install and no API key.
 node server.js
 ```
 
-Open http://127.0.0.1:8001. The development server only exposes the six browser assets, and binds to localhost. It is not a production server.
+Open [localhost:8001](http://127.0.0.1:8001). The development server serves only the app's browser assets and binds to localhost. It is not a production server.
 
 ## Features
 
@@ -65,16 +69,19 @@ Each run records station availability, reading age, distance, and request durati
 | `styles.css`            | Responsive presentation                                  |
 | `script.js`             | DOM rendering, search interactions, state and storage    |
 | `weather.js`            | Data formatting, request coordination, forecast rules    |
-| `tests/weather.test.js` | Timezones, units, missing data, requests, forecast rules |
+| `tests/`               | Data validation, observations, timezones, and browser checks |
+| `scripts/`             | Live station availability sampling                       |
+| `docs/`                | Weather source comparisons and validation notes          |
+| `audits/`              | Saved public API responses, including test fixtures      |
 | `server.js`             | Local development server                                 |
 
-## Staging workflow
+## Development and deployment
 
 Development happens on `codex/weather-staging`. Review the local app and run checks before pushing this branch. Open a pull request into `main` after review. Main remains the release baseline.
 
-The online staging preview uses GitHub Pages: [Open Atmos](https://johntri-professionalhub.github.io/Clean-Weather-App/). The `Deploy staging preview` workflow deploys pushes to `codex/weather-staging` after syntax checks and unit tests pass in all three timezone environments. Browser regression checks remain a separate local step.
+The live site uses GitHub Pages. The `Deploy Atmos` workflow publishes `main` after syntax checks and unit tests pass in all three timezone environments. Changes on `codex/weather-staging` receive CI checks without updating the public website. Browser regression checks remain a separate local step before merging.
 
-Only `index.html`, `styles.css`, `script.js`, `weather.js`, and `favicon.svg` are published. Tests, audit files, and the development server are excluded from the hosted artifact. No build step or paid hosting plan is required for this public repository. The portfolio's separate public folder is not used by this app. This URL is a public staging preview; deploying it does not merge changes into `main`.
+Only `index.html`, `styles.css`, `script.js`, `weather.js`, and `favicon.svg` are published. Tests, audit files, and the development server are excluded from the hosted artifact. No build step or paid hosting plan is required for this public repository.
 
 ## Boundaries and next validation
 
@@ -83,7 +90,7 @@ Only `index.html`, `styles.css`, `script.js`, `weather.js`, and `favicon.svg` ar
 - Uses local system fonts and Georgia; no font downloads, ads, or analytics.
 - No geolocation permission, analytics, accounts, or API secrets. Search queries and coordinates go to Open-Meteo; US city coordinates also go to api.weather.gov; no external font requests are made. Recent cities and units remain in this browser's local storage.
 - Automated tests cover the data layer, with a browser regression suite available locally. The suite has passed in the in-app browser, and layouts have been checked at 320px and 390px widths. Full screen-reader testing, Safari/Firefox coverage, multi-day station availability checks, and user feedback remain release work.
-- Check the provider's current usage terms and limits before public deployment.
+- Weather providers' usage terms and request limits apply; reassess them before commercial use or increased traffic.
 
 ## Station temperature and hourly chart
 

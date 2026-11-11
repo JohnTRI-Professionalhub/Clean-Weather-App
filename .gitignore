@@ -6,3 +6,8 @@ Desktop.ini
 *.log
 
 local-reports/
+node_modules/
+_site/
+.env
+.env.*
+!.env.example

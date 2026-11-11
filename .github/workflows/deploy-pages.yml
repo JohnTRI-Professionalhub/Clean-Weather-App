@@ -1,20 +1,20 @@
-name: Deploy staging preview
+name: Deploy Atmos
 
 on:
   push:
-    branches: [codex/weather-staging]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: staging-pages
+  group: pages
   cancel-in-progress: false
 
 jobs:
   test:
-    if: github.ref == 'refs/heads/codex/weather-staging'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -49,6 +49,6 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
-      - name: Deploy staging
+      - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v5
